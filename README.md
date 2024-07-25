@@ -1,7 +1,5 @@
 # dicto.py 📝🔊
 
----
-
 This is your friendly dictation companion, designed to make writing tasks a breeze!
 
 dicto.py is a simple yet powerful application that reads text aloud, allowing you to write it down physically at your own pace. It's perfect for:

@@ -14,10 +14,12 @@ import os
 import sys
 import argparse
 
+pygame.init() # outside class?
+pygame.mixer.init()
+
 class TextToSpeechDictator:
     def __init__(self):
-        pygame.init()
-        pygame.mixer.init()
+        
         self.punctuation_mapping = {
             '.': 'full stop',
             ',': 'comma',
@@ -77,6 +79,7 @@ class TextToSpeechDictator:
             while i < len(words):
                 group = []
                 display_group = []
+
                 for _ in range(self.word_group):
                     if i < len(words):
                         word = words[i]
@@ -108,24 +111,24 @@ class TextToSpeechDictator:
                     time.sleep(self.stop_after_fullstop)
 
 def get_user_input():
-    # file = os.path.abspath(str(sys.argv[0]))
+
     parser = argparse.ArgumentParser()
     parser.add_argument("file", help="echo the string you use here")
     args = parser.parse_args()
 
     file = os.path.abspath(args.file)
 
-    t = open(args.file, "r")
-    text = t.read()
-    lang = "en"
-    tld = "com.ng"
-    stop_after_fullstop = 1
-    word_group = 2
-    base_pause = 0.5
-    extra_pause_frequency = 2
-    extra_pause_duration = 1
-    length_multiplier = 0.1
-    return text, lang, tld, stop_after_fullstop, word_group, base_pause, extra_pause_frequency, extra_pause_duration, length_multiplier
+    with open(args.file, "r") as t:
+        text = t.read()
+        lang = "en"
+        tld = "co.uk"
+        stop_after_fullstop = 1.5
+        word_group = 2
+        base_pause = 0.1
+        extra_pause_frequency = 2
+        extra_pause_duration = 1
+        length_multiplier = 0
+        return text, lang, tld, stop_after_fullstop, word_group, base_pause, extra_pause_frequency, extra_pause_duration, length_multiplier
 
 if __name__ == "__main__":
     dictator = TextToSpeechDictator()

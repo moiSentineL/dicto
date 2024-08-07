@@ -11,7 +11,7 @@ pygame.init()  # outside class?
 pygame.mixer.init()
 
 
-class TextToSpeechDictator:
+class dicto:
     def __init__(self):
         self.punctuation_mapping = {
             ".": "full stop",
@@ -102,7 +102,7 @@ class TextToSpeechDictator:
 
 
 if __name__ == "__main__":
-    dictator = TextToSpeechDictator()
+    dictator = dicto()
 
     parser = argparse.ArgumentParser()
     parser.add_argument("file", help="echo the string you use here")

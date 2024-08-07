@@ -13,7 +13,6 @@ pygame.mixer.init()
 
 class TextToSpeechDictator:
     def __init__(self):
-
         self.punctuation_mapping = {
             ".": "full stop",
             ",": "comma",
@@ -51,7 +50,6 @@ class TextToSpeechDictator:
             )
 
     def display_paragraph(self, paragraph, current_group):
-
         os.system("cls" if os.name == "nt" else "clear")  # Clear console
 
         highlighted = []
@@ -104,7 +102,6 @@ class TextToSpeechDictator:
 
 
 if __name__ == "__main__":
-
     dictator = TextToSpeechDictator()
 
     parser = argparse.ArgumentParser()

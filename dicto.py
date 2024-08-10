@@ -114,8 +114,6 @@ class dicto:
                 bruh = st.empty()
                 bruh.text(highlighted_text)
 
-                # self.display_paragraph(paragraph, " ".join(display_group))
-
                 # Speak the group
                 self.speak_group(" ".join(group), (is_last_group := i >= len(words)))
 

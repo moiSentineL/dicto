@@ -1,6 +1,7 @@
 from gtts import gTTS
 import pygame
 import io
+from io import StringIO
 import time
 import re
 import os
@@ -112,7 +113,7 @@ class dicto:
 
                 highlighted_text = self.display_paragraph(paragraph, ' '.join(display_group))
                 bruh = st.empty()
-                bruh.text(highlighted_text)
+                bruh.subheader(highlighted_text)
 
                 # Speak the group
                 self.speak_group(" ".join(group), (is_last_group := i >= len(words)))
@@ -132,15 +133,16 @@ if __name__ == "__main__":
 
     dictator = dicto()
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("file", help="echo the string you use here")
+    with st.expander("Your File",expanded=True):
+        uploaded = st.empty().file_uploader("Upload a file lol", type="txt", label_visibility="collapsed")
 
-    with open(os.path.abspath(parser.parse_args().file), "r") as t:
-        text = t.read()
+    if uploaded is not None:
+        text = StringIO(uploaded.getvalue().decode("utf-8")).read()
 
-    try:
-        dictator.dictate(text)
-    except Exception as e:
-        print(f"An error occurred: {e}")
-    finally:
-        pygame.quit()
+        try:
+            dictator.dictate(text) if st.button("Dictate!") else st.write("")
+            
+        except Exception as e:
+            st.header(f"An error occurred: {e}")
+        finally:
+            pygame.quit()

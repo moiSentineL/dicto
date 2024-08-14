@@ -23,43 +23,25 @@ class dicto:
             ";": "semicolon",
             ":": "colon",
             "-": "hyphen",
+            "(": "bracket",
+            ")": "bracket-close"
         }
         with st.sidebar:
-            self.lang = "en" # st.selectbox(
-            #             "Language",
-            #             ("Email", "Home phone", "Mobile phone"),
-                    # ) #"en"
-            self.tld =  "co.uk" #st.selectbox(
-                    #     "How would you like to be contacted?",
-                    #     ("Email", "Home phone", "Mobile phone"),
-                    # ) # "co.uk"
+            st.header("Configuration")
+            self.lang = st.selectbox("Select language", ("en", "fr", "hi"), key="lang") #"en"
+            self.tld = st.selectbox("Accent", ("co.uk", "com.ng", "com.au"), key="tld") # "co.uk"
             self.stop_after_fullstop = st.slider("Pause after fullstop (s)", 0.0, 5.0, 1.5) # 1.5
             self.word_group = st.slider("How many words at once?", 0, 5, 2) #2
-            self.base_pause = st.slider("Minimum pause", 0.0, 5.0, 0.5)  # 0.5
+            self.base_pause = st.slider("Minimum pause (s)", 0.0, 5.0, 0.5)  # 0.5
             # self.extra_pause_frequency = 2
             # self.extra_pause_duration = 1.2
             self.length_multiplier = st.slider("Length Multiplier", 0.0, 1.0, 0.135)  # 0.135
-
-    # def autoplay_audio(audio_data: str):
-        
-        # b64 = base64.b64encode(audio_data.getvalue()).decode()
-        # md = f"""
-        #     <audio style="display:none" controls autoplay="true">
-        #     <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
-        #     </audio>
-        #     """
-        # st.markdown(
-        #     md,
-        #     unsafe_allow_html=True,
-        # )
 
     def speak_group(self, group, is_last_group):
         fp = io.BytesIO()
         tts = gTTS(text=group, lang=self.lang, tld=self.tld, slow=False)
         tts.write_to_fp(fp)
         fp.seek(0)
-
-        # dicto.autoplay_audio(fp)
 
         pygame.mixer.music.load(fp)
         pygame.mixer.music.play()
@@ -73,7 +55,6 @@ class dicto:
             )
 
     def display_paragraph(self, paragraph, current_group):  
-        # os.system("cls" if os.name == "nt" else "clear")  # Clear console
 
         highlighted = []
         current_group_words = current_group.split()
@@ -130,19 +111,28 @@ class dicto:
 
 if __name__ == "__main__":
     st.title("dicto")
+    with st.expander("Instructions", expanded=True):
+        st.write(open("INSTRUCTIONS.md", "r").read())
 
-    dictator = dicto()
-
+    area = st.text_area(
+            "Text to dictate",
+            "It was the best of times, it was the worst of times, it was the age of "
+            "wisdom, it was the age of foolishness, it was the epoch of belief, it "
+            "was the epoch of incredulity, it was the season of Light, it was the "
+            "season of Darkness, it was the spring of hope, it was the winter of "
+            "despair.", key="textarea"  
+        )
     with st.expander("Your File",expanded=True):
-        uploaded = st.empty().file_uploader("Upload a file lol", type="txt", label_visibility="collapsed")
-
-    if uploaded is not None:
-        text = StringIO(uploaded.getvalue().decode("utf-8")).read()
-
-        try:
+        uploaded = st.empty().file_uploader("Upload a file lol", type="txt", label_visibility="collapsed", key="upload")
+    
+    try:
+        dictator = dicto()
+        text = StringIO(uploaded.getvalue().decode("utf-8")).read() if uploaded is not None else area
+        
+        with st.container():
             dictator.dictate(text) if st.button("Dictate!") else st.write("")
-            
-        except Exception as e:
-            st.header(f"An error occurred: {e}")
-        finally:
-            pygame.quit()
+    except Exception as e:
+        st.divider()
+        st.exception(e)
+    finally:
+        pygame.quit()

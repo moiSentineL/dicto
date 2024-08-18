@@ -6,8 +6,8 @@ import time
 import re
 import os
 import sys
-import argparse
 import base64
+import json
 import streamlit as st
 
 pygame.init()  # outside class?
@@ -15,27 +15,19 @@ pygame.mixer.init()
 
 class dicto:
     def __init__(self):
-        self.punctuation_mapping = {
-            ".": "full stop",
-            ",": "comma",
-            "?": "question mark",
-            "!": "exclamation mark",
-            ";": "semicolon",
-            ":": "colon",
-            "-": "hyphen",
-            "(": "bracket",
-            ")": "bracket-close"
-        }
+        with open("punctuation.json", "r") as punc:
+            self.punctuation_mapping = json.load(punc)
+
         with st.sidebar:
             st.header("Configuration")
-            self.lang = st.selectbox("Select language", ("en", "fr", "hi"), key="lang") #"en"
-            self.tld = st.selectbox("Accent", ("co.uk", "com.ng", "com.au"), key="tld") # "co.uk"
-            self.stop_after_fullstop = st.slider("Pause after fullstop (s)", 0.0, 5.0, 1.5) # 1.5
-            self.word_group = st.slider("How many words at once?", 0, 5, 2) #2
-            self.base_pause = st.slider("Minimum pause (s)", 0.0, 5.0, 0.5)  # 0.5
+            self.lang = st.selectbox("Select language", ("en", "fr", "hi"), key="lang")
+            self.tld = st.selectbox("Accent", ("co.uk", "com.ng", "com.au"), key="tld")
+            self.stop_after_fullstop = st.slider("Pause after fullstop (s)", 0.0, 5.0, 1.5)
+            self.word_group = st.slider("How many words at once?", 0, 5, 2)
+            self.base_pause = st.slider("Minimum pause (s)", 0.0, 3.0, 0.5) 
             # self.extra_pause_frequency = 2
             # self.extra_pause_duration = 1.2
-            self.length_multiplier = st.slider("Length Multiplier", 0.0, 1.0, 0.135)  # 0.135
+            self.length_multiplier = st.slider("Length Multiplier", 0.0, 1.0, 0.135)
 
     def speak_group(self, group, is_last_group):
         fp = io.BytesIO()
@@ -80,17 +72,23 @@ class dicto:
 
                 for _ in range(self.word_group):
                     if i < len(words):
-                        display_group.append(   word := words[i])
+                        display_group.append(word := words[i])
 
                         # Check if the word ends with a punctuation
-                        if word[-1] in self.punctuation_mapping:
-                            group.append(word[:-1])
-                            group.append(self.punctuation_mapping[word[-1]])
+                        if word[0] in self.punctuation_mapping:
+                            group.append(self.punctuation_mapping[word[0]])
+                            group.append(word)
                         else:
                             group.append(word)
                         i += 1
-                        if word[-1] in self.punctuation_mapping:
+
+                        if word[0] in self.punctuation_mapping:
                             break
+
+                        if word[-1] in self.punctuation_mapping:
+                            group.append(self.punctuation_mapping[word[-1]])
+                            break
+                        
 
                 highlighted_text = self.display_paragraph(paragraph, ' '.join(display_group))
                 bruh = st.empty()

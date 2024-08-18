@@ -1,7 +1,6 @@
 from gtts import gTTS
 import pygame
 import io
-from io import StringIO
 import time
 import re
 import os
@@ -13,6 +12,7 @@ import streamlit as st
 pygame.init()  # outside class?
 pygame.mixer.init()
 
+
 class dicto:
     def __init__(self):
         with open("punctuation.json", "r") as punc:
@@ -22,9 +22,11 @@ class dicto:
             st.header("Configuration")
             self.lang = st.selectbox("Select language", ("en", "fr", "hi"), key="lang")
             self.tld = st.selectbox("Accent", ("co.uk", "com.ng", "com.au"), key="tld")
-            self.stop_after_fullstop = st.slider("Pause after fullstop (s)", 0.0, 5.0, 1.5)
+            self.stop_after_fullstop = st.slider(
+                "Pause after fullstop (s)", 0.0, 5.0, 1.5
+            )
             self.word_group = st.slider("How many words at once?", 0, 5, 2)
-            self.base_pause = st.slider("Minimum pause (s)", 0.0, 3.0, 0.5) 
+            self.base_pause = st.slider("Minimum pause (s)", 0.0, 3.0, 0.5)
             # self.extra_pause_frequency = 2
             # self.extra_pause_duration = 1.2
             self.length_multiplier = st.slider("Length Multiplier", 0.0, 1.0, 0.135)
@@ -46,7 +48,7 @@ class dicto:
                 + ((sum(len(word) for word in group.split())) * self.length_multiplier)
             )
 
-    def display_paragraph(self, paragraph, current_group):  
+    def display_paragraph(self, paragraph, current_group):
 
         highlighted = []
         current_group_words = current_group.split()
@@ -88,9 +90,10 @@ class dicto:
                         if word[-1] in self.punctuation_mapping:
                             group.append(self.punctuation_mapping[word[-1]])
                             break
-                        
 
-                highlighted_text = self.display_paragraph(paragraph, ' '.join(display_group))
+                highlighted_text = self.display_paragraph(
+                    paragraph, " ".join(display_group)
+                )
                 bruh = st.empty()
                 bruh.subheader(highlighted_text)
 
@@ -103,7 +106,7 @@ class dicto:
 
                 if group[-1] == "full stop":
                     time.sleep(self.stop_after_fullstop)
-                
+
                 bruh.empty()
 
 
@@ -113,20 +116,27 @@ if __name__ == "__main__":
         st.write(open("INSTRUCTIONS.md", "r").read())
 
     area = st.text_area(
-            "Text to dictate",
-            "It was the best of times, it was the worst of times, it was the age of "
-            "wisdom, it was the age of foolishness, it was the epoch of belief, it "
-            "was the epoch of incredulity, it was the season of Light, it was the "
-            "season of Darkness, it was the spring of hope, it was the winter of "
-            "despair.", key="textarea"  
+        "Text to dictate",
+        "It was the best of times, it was the worst of times, it was the age of "
+        "wisdom, it was the age of foolishness, it was the epoch of belief, it "
+        "was the epoch of incredulity, it was the season of Light, it was the "
+        "season of Darkness, it was the spring of hope, it was the winter of "
+        "despair.",
+        key="textarea",
+    )
+    with st.expander("Your File", expanded=True):
+        uploaded = st.empty().file_uploader(
+            "Upload a file lol", type="txt", label_visibility="collapsed", key="upload"
         )
-    with st.expander("Your File",expanded=True):
-        uploaded = st.empty().file_uploader("Upload a file lol", type="txt", label_visibility="collapsed", key="upload")
-    
+
     try:
         dictator = dicto()
-        text = StringIO(uploaded.getvalue().decode("utf-8")).read() if uploaded is not None else area
-        
+        text = (
+            io.StringIO(uploaded.getvalue().decode("utf-8")).read()
+            if uploaded is not None
+            else area
+        )
+
         with st.container():
             dictator.dictate(text) if st.button("Dictate!") else st.write("")
     except Exception as e:

@@ -15,7 +15,7 @@ pygame.mixer.init()
 
 class dicto:
     def __init__(self):
-        with open("punctuation.json", "r") as punc:
+        with open("punctuation.json", "r", encoding="utf-8") as punc:
             self.punctuation_mapping = json.load(punc)
 
         with st.sidebar:
